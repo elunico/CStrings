@@ -197,7 +197,6 @@ int random_bound() { return 1; }
 #endif
 
 int main(int argc, char const **argv) {
-
   // for (int i = 0; i < random_bound(); i++) {
   string_t *s = string("Hello world!   ");
   string_t *r = string("   hi there! ");

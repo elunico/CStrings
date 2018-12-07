@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-string_t *string(char*from);
+string_t *string(char *from);
 string_t *view(string_t *s, unsigned int start, unsigned int end);
 string_t *substring(char *from, unsigned int start, unsigned int end);
 int charAt(string_t *s, int idx);
