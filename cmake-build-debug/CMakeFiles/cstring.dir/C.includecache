@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/thomas/Desktop/cstring/strings.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+assert.h
+-
+assert.h
+-
+time.h
+-
+
