@@ -3,6 +3,7 @@
 #include <string.h>
 
 #ifdef TEST
+#include <assert.h>
 #include <time.h>
 #endif
 
@@ -127,6 +128,47 @@ int starts_with(string_t *a, string_t *pat) {
   return 1;
 }
 
+int rcontains_help(string_t *a, string_t *s, int ai, int si) {
+  if (si == s->size)
+    return 1;
+  if (ai == a->size)
+    return 0;
+  if (char_at(a, ai) == char_at(s, si))
+    return rcontains_help(a, s, ai + 1, si + 1);
+  else
+    return rcontains_help(a, s, ai + 1, si);
+}
+
+int rcontains(string_t *a, string_t *s) { return rcontains_help(a, s, 0, 0); }
+
+int contains(string_t *a, string_t *sub) {
+  if (sub->size > a->size)
+    return 0;
+  if (!string_compare(sub, a))
+    return 1;
+
+  char *outer = a->data;
+  char *inner = sub->data;
+  int ai = 0;
+  int si = 0;
+
+  while (ai < a->size) {
+    if (char_at(a, ai) != char_at(sub, si)) {
+      ai++;
+    }
+    while (si < sub->size && char_at(a, ai) == char_at(sub, si)) {
+      ai++;
+      si++;
+    }
+    if (si == sub->size && char_at(sub, si - 1) == char_at(a, ai - 1)) {
+      return 1;
+    } else {
+      si = 0;
+    }
+  }
+  return 0;
+}
+
 string_t *trim(string_t *original) {
   int start, end;
   int idx = 0;
@@ -156,56 +198,71 @@ int random_bound() { return 1; }
 
 int main(int argc, char const **argv) {
 
-  for (int i = 0; i < random_bound(); i++) {
-    string_t *s = string("Hello world!   ");
-    string_t *r = string("   hi there! ");
-    string_t *h = substring(s, 0, 5);
-    string_t *g = string("Where in the world is carmen sandiego?");
-    string_t *w = string("       ");
-    string_t *world1 = substring(g, 13, 18);
-    string_t *world2 = substring(s, 6, 11);
-    int eq = string_compare(world1, world2);
-    string_view_t *v1 = view(s, 0, 5);
-    string_view_t *v2 = view(s, 6, 11);
-    string_view_t *v3 = view(s, 5, 7);
+  // for (int i = 0; i < random_bound(); i++) {
+  string_t *s = string("Hello world!   ");
+  string_t *r = string("   hi there! ");
+  string_t *h = substring(s, 0, 5);
+  string_t *g = string("Where in the world is carmen sandiego?");
+  string_t *w = string("       ");
+  string_t *world1 = substring(g, 13, 18);
+  string_t *world2 = substring(s, 6, 11);
+  int eq = string_compare(world1, world2);
+  string_view_t *v1 = view(s, 0, 5);
+  string_view_t *v2 = view(s, 6, 11);
+  string_view_t *v3 = view(s, 5, 7);
 
-    string_t *c1 = concat(s, g);
-    string_t *c2 = concat(world1, world2);
+  string_t *c1 = concat(s, g);
+  string_t *c2 = concat(world1, world2);
 
-    string_t *t1 = trim(w);
-    string_t *t2 = trim(s);
-    string_t *t3 = trim(r);
+  int n1 = rcontains(s, h);
+  assert(n1 == 1);
+  int n2 = rcontains(s, world1);
+  assert(n2 == 1);
+  int n3 = rcontains(s, world2);
+  assert(n3 == 1);
+  int n4 = rcontains(s, g);
+  assert(n4 == 0);
+  int n5 = rcontains(s, w);
+  assert(n5 == 0);
+  int n6 = rcontains(g, world2);
+  assert(n6 == 1);
+  int n7 = rcontains(world2, g);
+  assert(n7 == 0);
 
-    int y1 = starts_with(s, h);
-    int n1 = starts_with(s, world1);
+  string_t *t1 = trim(w);
+  string_t *t2 = trim(s);
+  string_t *t3 = trim(r);
 
-    // print_view(v1, stdout, 1);
-    // print_view(v2, stdout, 1);
-    // print_view(v3, stdout, 1);
+  int y1 = starts_with(s, h);
+  int n8 = starts_with(s, world1);
 
-    string_t *s1 = stringify(v1);
-    string_t *s2 = stringify(v2);
-    string_t *s3 = stringify(v3);
+  // print_view(v1, stdout, 1);
+  // print_view(v2, stdout, 1);
+  // print_view(v3, stdout, 1);
 
-    view_done(v1);
-    view_done(v2);
-    view_done(v3);
+  string_t *s1 = stringify(v1);
+  string_t *s2 = stringify(v2);
+  string_t *s3 = stringify(v3);
 
-    char x = (char)char_at(h, 2);
-    strdec(s);
-    strdec(h);
-    strdec(r);
-    strdec(w);
-    strdec(g);
-    strdec(world1);
-    strdec(world2);
-    strdec(s1);
-    strdec(s2);
-    strdec(s3);
-    strdec(c1);
-    strdec(c2);
-    strdec(t1);
-    strdec(t2);
-    strdec(t3);
-  }
+  view_done(v1);
+  view_done(v2);
+  view_done(v3);
+
+  char x = (char)char_at(h, 2);
+  strdec(s);
+  strdec(h);
+  strdec(r);
+  strdec(w);
+  strdec(g);
+  strdec(world1);
+  strdec(world2);
+  strdec(s1);
+  strdec(s2);
+  strdec(s3);
+  strdec(c1);
+  strdec(c2);
+  strdec(t1);
+  strdec(t2);
+  strdec(t3);
+  // }
 }
