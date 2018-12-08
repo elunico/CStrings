@@ -14,12 +14,10 @@ int isWhitespace(char c) {
   return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\v';
 }
 
-char *sha256_hexdigest(char *o) { return strdup("1sd09e09fa090ae7d"); }
 
 string_t *string(char *from) {
   string_t *s = malloc(sizeof(*s));
   s->data = strdup(from);
-  s->hash = sha256_hexdigest(from);
   s->size = strlen(from);
   s->refcnt = 1;
   return s;
@@ -31,7 +29,6 @@ void strdec(string_t *s) {
   s->refcnt--;
   if (!s->refcnt) {
     free(s->data);
-    free(s->hash);
     free(s);
   }
 }
@@ -96,7 +93,8 @@ string_t *stringify(string_view_t *view) {
 }
 
 string_t *concat(string_t *a, string_t *b) {
-  char *n = malloc((sizeof(char)) * (a->size + b->size));
+  // TODO: why does using malloc instead of calloc result in valgrind errors?
+  char *n = calloc(1,(sizeof(char)) * (a->size + b->size) + 1);
   strncpy(n, a->data, a->size);
   n += a->size;
   strncpy(n, b->data, b->size);
@@ -104,7 +102,6 @@ string_t *concat(string_t *a, string_t *b) {
   string_t *ret = malloc(sizeof(*ret));
   ret->data = n;
   ret->refcnt = 1;
-  ret->hash = sha256_hexdigest(n);
   ret->size = a->size + b->size;
   return ret;
 }
@@ -280,7 +277,6 @@ string_t *readline(FILE *source) {
     ret->data = buffer;
     // TODO: probably do not want to recalculate this
     ret->size = idx;
-    ret->hash = sha256_hexdigest(buffer);
     ret->refcnt = 1;
   }
   return ret;

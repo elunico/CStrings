@@ -8,8 +8,6 @@
 typedef struct
 {
   char *data;
-  // 256 bit hash plus null byte
-  char *hash;
   size_t size;
   size_t refcnt;
 } string_t;
@@ -28,8 +26,13 @@ typedef struct stt
   int size;
 } string_tokens_t;
 
-// returned string is reference counted using strinc and strdec; strdec frees
-// data on dec to 0
+// returned string is reference counted using strinc and strdec; strdec frees data on dec to 0
+// DO NOT CALL free on the string_t * types only call strinc and strdec as appropriate
+// NOTICE: the char* from is strdup'd so that reference counting can happen and so that 
+// the library function substring() can function, therefore you may free any char* passed 
+// to string() as soon as the function returns. 
+// (Substring works by setting internal characters to '\0' and string() must strdup to prevent
+//  illegal writes of static memroy)
 string_t *string(char *from);
 void strinc(string_t *s);
 void strdec(string_t *s);
