@@ -271,8 +271,19 @@ string_t *readline(FILE *source) {
     }
     c = getc(source);
   }
-  *(buffer + idx + 1) = '\0';
-  return buffer ? string(buffer) : NULL;
+  if (buffer != NULL)
+    *(buffer + idx + 1) = '\0';
+
+  string_t *ret = NULL;
+  if (buffer) {
+    ret = malloc(sizeof(*ret));
+    ret->data = buffer;
+    // TODO: probably do not want to recalculate this
+    ret->size = strlen(buffer);
+    ret->hash = sha256_hexdigest(buffer);
+    ret->refcnt = 1;
+  }
+  return ret;
 }
 
 void tokens_done(string_tokens_t *tokens) {
@@ -280,95 +291,34 @@ void tokens_done(string_tokens_t *tokens) {
     return;
   } else {
     tokens_done(tokens->next);
-    free(tokens->next);
     strdec(tokens->token);
+    free(tokens);
   }
 }
 
 char *charp(string_t *s) { return s->data; }
 
 int main(int argc, char const **argv) {
-  // for (int i = 0; i < random_bound(); i++) {
-  //  string_t* s = string("Hello world!   ");
-  //  string_t* r = string("   hi there! ");
-  //  string_t* h = substring(s, 0, 5);
-  //  string_t* g = string("Where in the world is carmen sandiego?");
-
-  FILE *f = fopen("/home/thomas/Desktop/cstring/colors.csv", "r");
+  FILE *f = fopen("rgb.txt", "r");
   if (f == NULL) {
     strerror(errno);
     abort();
   }
   string_t *t;
   while ((t = readline(f)) != NULL) {
-    string_tokens_t *tokens = tokenize(t, ',');
-    for (int i = 0; i < tokens->size; i++) {
-      printf("t: %s |", charp(get_token(tokens, i)));
+    string_tokens_t *tokens = tokenize(t, '\t');
+    if (tokens->size < 2) {
+      tokens_done(tokens);
+      strdec(t);
+    } else {
+      for (int i = 0; i < tokens->size; i++) {
+        printf("t: %s | ", charp(get_token(tokens, i)));
+      }
+      printf("\n");
+      strdec(t);
+      tokens_done(tokens);
     }
-    strdec(t);
-    tokens_done(tokens);
   }
 
-  // string_t* w = string("       ");
-  // string_t* world1 = substring(g, 13, 18);
-  // string_t* world2 = substring(s, 6, 11);
-  // int eq = string_compare(world1, world2);
-  // string_view_t* v1 = view(s, 0, 5);
-  // string_view_t* v2 = view(s, 6, 11);
-  // string_view_t* v3 = view(s, 5, 7);
-
-  // string_t* c1 = concat(s, g);
-  // string_t* c2 = concat(world1, world2);
-
-  // int n1 = rcontains(s, h);
-  // assert(n1 == 1);
-  // int n2 = rcontains(s, world1);
-  // assert(n2 == 1);
-  // int n3 = rcontains(s, world2);
-  // assert(n3 == 1);
-  // int n4 = rcontains(s, g);
-  // assert(n4 == 0);
-  // int n5 = rcontains(s, w);
-  // assert(n5 == 0);
-  // int n6 = rcontains(g, world2);
-  // assert(n6 == 1);
-  // int n7 = rcontains(world2, g);
-  // assert(n7 == 0);
-
-  // string_t* t1 = trim(w);
-  // string_t* t2 = trim(s);
-  // string_t* t3 = trim(r);
-
-  // int y1 = starts_with(s, h);
-  // int n8 = starts_with(s, world1);
-
-  // // print_view(v1, stdout, 1);
-  // // print_view(v2, stdout, 1);
-  // // print_view(v3, stdout, 1);
-
-  // string_t* s1 = stringify(v1);
-  // string_t* s2 = stringify(v2);
-  // string_t* s3 = stringify(v3);
-
-  // view_done(v1);
-  // view_done(v2);
-  // view_done(v3);
-
-  // char x = (char) char_at(h, 2);
-  // strdec(s);
-  // strdec(h);
-  // strdec(r);
-  // strdec(w);
-  // strdec(g);
-  // strdec(world1);
-  // strdec(world2);
-  // strdec(s1);
-  // strdec(s2);
-  // strdec(s3);
-  // strdec(c1);
-  // strdec(c2);
-  // strdec(t1);
-  // strdec(t2);
-  // strdec(t3);
-  // }
+  fclose(f);
 }
