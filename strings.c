@@ -140,7 +140,7 @@ string_tokens_t *tokenize(string_t *s, char delim) {
   int start = 0;
   int idx = 0;
   while (idx < s->size) {
-    while (*(s->data + idx) != delim && idx < s->size) {
+    while (idx < s->size && *(s->data + idx) != delim) {
       idx++;
     }
     string_t *tok = substring(s, start, idx);
