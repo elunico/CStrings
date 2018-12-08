@@ -259,8 +259,8 @@ string_t *readline(FILE *source) {
     }
     *(buffer + idx) = (char)c;
     idx++;
-    if (idx == size) {
-      size = (int)(size * 1.5);
+    if (idx == size-1) {
+      size = (int)(size * 1.5) + 1;
       if (size < 0) {
         return NULL;
       }
@@ -279,7 +279,7 @@ string_t *readline(FILE *source) {
     ret = malloc(sizeof(*ret));
     ret->data = buffer;
     // TODO: probably do not want to recalculate this
-    ret->size = strlen(buffer);
+    ret->size = idx;
     ret->hash = sha256_hexdigest(buffer);
     ret->refcnt = 1;
   }
