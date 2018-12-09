@@ -40,4 +40,5 @@ int main(int argc, char const **argv) {
     }
   }
   fclose(f);
+  return 0;
 }
