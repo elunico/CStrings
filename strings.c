@@ -5,15 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef TEST
-#include <assert.h>
-#include <time.h>
-#endif
-
 int isWhitespace(char c) {
   return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\v';
 }
-
 
 string_t *string(char *from) {
   string_t *s = malloc(sizeof(*s));
@@ -94,7 +88,7 @@ string_t *stringify(string_view_t *view) {
 
 string_t *concat(string_t *a, string_t *b) {
   // TODO: why does using malloc instead of calloc result in valgrind errors?
-  char *n = calloc(1,(sizeof(char)) * (a->size + b->size) + 1);
+  char *n = calloc(1, (sizeof(char)) * (a->size + b->size) + 1);
   strncpy(n, a->data, a->size);
   n += a->size;
   strncpy(n, b->data, b->size);
@@ -141,8 +135,8 @@ string_tokens_t *tokenize(string_t *s, char delim) {
       idx++;
     }
     string_t *tok = substring(s, start, idx);
-    idx++;       // discard delim
-    start = idx; // begin substrings from idx
+    idx++;        // discard delim
+    start = idx;  // begin substrings from idx
     strinc(tok);
     if (list == NULL) {
       list = calloc(1, sizeof(*list));
@@ -231,19 +225,6 @@ string_t *get_token(string_tokens_t *toks, int idx) {
   return ptr->token;
 }
 
-#ifdef TEST
-int random_bound() {
-  srand(time(NULL));
-  return rand() % 75000;
-}
-#elif defined(DEBUG)
-int random_bound() { return 500; }
-#else
-
-int random_bound() { return 1; }
-
-#endif
-
 string_t *readline(FILE *source) {
   int size = 10;
   char *buffer = NULL;
@@ -256,7 +237,7 @@ string_t *readline(FILE *source) {
     }
     *(buffer + idx) = (char)c;
     idx++;
-    if (idx == size-1) {
+    if (idx == size - 1) {
       size = (int)(size * 1.5) + 1;
       if (size < 0) {
         return NULL;
@@ -268,8 +249,9 @@ string_t *readline(FILE *source) {
     }
     c = getc(source);
   }
-  if (buffer != NULL)
+  if (buffer != NULL) {
     *(buffer + idx + 1) = '\0';
+  }
 
   string_t *ret = NULL;
   if (buffer) {
@@ -283,9 +265,9 @@ string_t *readline(FILE *source) {
 }
 
 void tokens_done(string_tokens_t *tokens) {
-  if (tokens == NULL) {
+  if (tokens == NULL)
     return;
-  } else {
+  else {
     tokens_done(tokens->next);
     strdec(tokens->token);
     free(tokens);
