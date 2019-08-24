@@ -87,11 +87,13 @@ string_t *stringify(string_view_t *view) {
 }
 
 string_t *concat(string_t *a, string_t *b) {
-  // TODO: why does using malloc instead of calloc result in valgrind errors?
-  char *n = calloc(1, (sizeof(char)) * (a->size + b->size) + 1);
+  char *n = malloc((sizeof(char)) * (a->size + b->size) + 1);
   strncpy(n, a->data, a->size);
   n += a->size;
   strncpy(n, b->data, b->size);
+  // remove calloc for malloc
+  // add 0 to end of string
+  *(n + b->size) = '\0';
   n -= a->size;
   string_t *ret = malloc(sizeof(*ret));
   ret->data = n;
