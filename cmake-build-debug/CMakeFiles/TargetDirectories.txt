@@ -1,3 +1,0 @@
-/home/thomas/Desktop/cstring/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/thomas/Desktop/cstring/cmake-build-debug/CMakeFiles/cstring.dir
-/home/thomas/Desktop/cstring/cmake-build-debug/CMakeFiles/edit_cache.dir

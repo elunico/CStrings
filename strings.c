@@ -130,15 +130,15 @@ int ends_with(string_t *a, string_t *pat) {
 string_tokens_t *tokenize(string_t *s, char delim) {
   string_tokens_t *list = NULL;
   string_tokens_t *ret = NULL;
-  int start = 0;
-  int idx = 0;
+  size_t start = 0;
+  size_t idx = 0;
   while (idx < s->size) {
     while (idx < s->size && *(s->data + idx) != delim) {
       idx++;
     }
     string_t *tok = substring(s, start, idx);
-    idx++;        // discard delim
-    start = idx;  // begin substrings from idx
+    idx++;       // discard delim
+    start = idx; // begin substrings from idx
     strinc(tok);
     if (list == NULL) {
       list = calloc(1, sizeof(*list));
@@ -260,7 +260,7 @@ string_t *readline(FILE *source) {
     ret = malloc(sizeof(*ret));
     ret->data = buffer;
     // TODO: probably do not want to recalculate this
-    ret->size = idx;
+    ret->size = (size_t)idx;
     ret->refcnt = 1;
   }
   return ret;
